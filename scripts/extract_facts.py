@@ -85,7 +85,8 @@ def main():
         try:
             raw = call_llm(make_prompt(num, title, text, present))
             data = parse_json(raw)
-            data = {k: v for k, v in data.items() if k in CHARACTERS and v}
+            # LLM 偶爾把值輸出成單一字串而非清單,一律正規化
+            data = {k: ([v] if isinstance(v, str) else v) for k, v in data.items() if k in CHARACTERS and v}
         except Exception as e:
             print(f"  FAILED ch{num}: {e}", flush=True)
             (FACTS / f"ch_{num:03d}.err").write_text(str(e), encoding="utf-8")
